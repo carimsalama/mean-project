@@ -44,7 +44,7 @@ String = String;
   getRandomProducts() {
     this._productService.getProducts({ limit: 50 }).subscribe({
       next: (res) => {
-        // shuffle and take 8
+        
         const shuffled = res.products.sort(() => Math.random() - 0.5);
         this.randomProducts = shuffled.slice(0, 9);
         this.cdr.detectChanges();
@@ -55,7 +55,7 @@ String = String;
   getCategories(){
     this._categoryService.getCategory().subscribe({
      next: (res) => {
-      // this.category=res.data;
+    
       this.category = res.data.filter(cat => cat.isActive);
       console.log(this.category)
       this.cdr.detectChanges();
