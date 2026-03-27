@@ -6,8 +6,7 @@ const { protect, isAdmin } = require('../middleware/auth.middleware');
 
 
 
-router.use(protect, isAdmin); // All admin routes require login + admin role
-// Reports
+router.use(protect, isAdmin); 
 router.get('/reports', getReports);
 
 
