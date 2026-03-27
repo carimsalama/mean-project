@@ -11,7 +11,6 @@ const getUsers = async (req, res)=>{
 
 const getUser = async (req, res) => {
   try {
-    //
     const user = await User.findById(req.user._id).select('-password');
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     res.status(200).json({ success: true, data: user });
@@ -38,18 +37,17 @@ try {
   if (!user){
     return res.status(404).json({success:false , message: 'User not found'})
   }
-   // update fields
     if (name)   user.name   = name;
     if (email)  user.email  = email;
     if (phone)  user.phone  = phone;
     if (gender) user.gender = gender;
     if (password && password.trim() !== '') 
-      {user.password = password; }// pre-save hook will hash it
+      {user.password = password; }
     if (req.file) {
       user.image = `/uploads/${req.file.filename}`;
     }
 
-    await user.save(); // triggers pre-save hash
+    await user.save();
   const updated = await User.findById(req.user._id).select('-password')
     res.status(200).json({ success: true, data: updated });
 
