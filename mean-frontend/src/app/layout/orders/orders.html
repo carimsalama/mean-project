@@ -1,0 +1,93 @@
+<h1 class="page-title">My Orders</h1>
+
+@if (orders.length === 0) {
+  <div class="orders-empty">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
+      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+      <rect x="9" y="3" width="6" height="4" rx="1"/>
+      <line x1="9" y1="12" x2="15" y2="12"/>
+      <line x1="9" y1="16" x2="13" y2="16"/>
+    </svg>
+    <p>You have no orders yet.</p>
+    <a routerLink="/productlist" class="buy-btn empty-btn">Start Shopping</a>
+  </div>
+}
+
+@if (orders.length > 0) {
+<div class="orders-wrapper">
+
+  @for (order of orders; track order._id) {
+  <div class="order-card">
+
+    <!-- ORDER HEADER -->
+    <div class="order-header">
+      <div class="order-meta">
+        <span class="order-number">{{ order.orderNumber }}</span>
+        <span class="order-date">{{ order.createdAt | date:'MMM d, yyyy' }}</span>
+      </div>
+      <div class="order-right">
+        <!-- <span class="order-status" [ngClass]="getStatusClass(order.status)"> -->
+        <span class="order-status"> 
+          {{ order.status }}
+        </span>
+        @if (order.status === 'Pending') {
+          <button class="cancel-btn" (click)="cancelOrder(order._id)">Cancel</button>
+          <!-- <button class="cancel-btn">Cancel</button> -->
+
+        }
+      </div>
+    </div>
+
+    <div class="order-divider"></div>
+
+    <!-- ORDER ITEMS -->
+    <div class="order-items">
+      
+
+      @for (item of order.items; track item._id) {
+      <div class="order-item">
+        <div class="order-item-image">
+          <img [src]="staticURL + item.image" [alt]="item.name">
+           <img src="" alt="no">
+        </div>
+        <div class="order-item-info">
+          <p class="order-item-name">{{ item.name }}</p>
+          <p class="order-item-qty">Qty: {{ item.quantity }}</p>
+        </div>
+        <p class="order-item-price">{{ item.price * item.quantity }} $</p>
+
+      </div>
+      }
+    </div>
+
+    <div class="order-divider"></div>
+
+    <!-- ORDER FOOTER -->
+    <div class="order-footer">
+      <div class="order-address">
+        <span class="order-address-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          {{ order.address.label }}
+        </span>
+        <span class="order-address-detail">
+            {{ order.address.street }}, {{ order.address.building }}, {{ order.address.city }}
+         
+
+        </span>
+      </div>
+      <div class="order-total">
+        <span class="order-total-label">Total</span>
+        <span class="order-total-price">{{ order.totalPrice }} $</span>
+        
+        
+    </div>
+    </div>
+
+  </div>
+  }
+
+</div>
+}

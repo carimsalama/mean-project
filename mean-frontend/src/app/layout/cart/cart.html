@@ -1,0 +1,107 @@
+<h1 class="page-title">My Cart</h1>
+
+@if (!cart || cart.items.length === 0) {
+  <div class="cart-empty">
+    <p>Your cart is empty.</p>
+  </div>
+}
+
+@if (cart && cart.items.length > 0) {
+<div class="cart-wrapper">
+
+  <!-- ITEMS -->
+  <div class="cart-items">
+
+    @for (item of cart.items; track item) {
+    <div class="cart-item">
+
+      <div class="cart-item-image">
+        <img [src]="staticURL + item.productId.image" [alt]="item.productId.name">
+      </div>
+
+      <div class="cart-item-info">
+        <h3>{{ item.productId.name }}</h3>
+        <p class="cart-item-price">{{ item.productId.price }} $</p>
+
+
+      </div>
+
+      <div class="cart-item-qty">
+        <button class="qty-btn" (click)="decrease(item)" [disabled]="item.quantity === 1">−</button>
+        <span class="qty-value">{{ item.quantity }}</span>
+        <button class="qty-btn" (click)="increase(item)" [disabled]="item.quantity >= item.productId.stock">+</button>
+      </div>
+
+      <p class="cart-item-total">{{ item.price * item.quantity }} $</p>
+
+      <button class="remove-btn" (click)="removeItem(item._id)">✕ Remove</button>
+
+    </div>
+    }
+
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="cart-summary">
+    <h4>Order Summary</h4>
+
+    <div class="summary-row">
+      <span>Subtotal</span>
+      <span>{{ cart.totalPrice }} $</span>
+    </div>
+
+    <div class="summary-row">
+      <span>Shipping</span>
+      <span>Free</span>
+    </div>
+
+    <div class="summary-divider"></div>
+
+    <div class="summary-row total">
+      <span>Total</span>
+      <span>{{ cart.totalPrice }} $</span>
+    </div>
+
+    <button routerLink="/checkout" class="buy-btn">Checkout</button>
+
+    <button class="clear-btn" (click)="clearCart()">Clear Cart</button>
+  </div>
+
+</div>
+}
+ @else {
+
+  @if (guestItems.length === 0) {
+    <div class="cart-empty"><p>Your cart is empty.</p></div>
+  }
+  @if (guestItems.length > 0) {
+  <div class="cart-wrapper">
+    <div class="cart-items">
+      @for (item of guestItems; track item.productId) {
+      <div class="cart-item">
+        <div class="cart-item-image">
+          <img [src]="staticURL + item.image" [alt]="item.name">
+        </div>
+        <div class="cart-item-info">
+          <h3>{{ item.name }}</h3>
+          <p class="cart-item-price">{{ item.price }} $</p>
+        </div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" (click)="decreaseGuest(item)" [disabled]="item.quantity === 1">−</button>
+          <span class="qty-value">{{ item.quantity }}</span>
+          <button class="qty-btn" (click)="increaseGuest(item)" [disabled]="item.quantity >= item.stock">+</button>
+        </div>
+        <p class="cart-item-total">{{ item.price * item.quantity }} $</p>
+        <button class="remove-btn" (click)="removeGuest(item.productId)">✕</button>
+      </div>
+      }
+    </div>
+
+    <div class="cart-summary">
+      <h4>Order Summary</h4>
+      <div class="summary-row"><span>Total</span><span>{{ guestTotal }} $</span></div>
+      <button class="buy-btn" routerLink="/login">Login to Checkout</button>
+    </div>
+  </div>
+  }
+}

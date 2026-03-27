@@ -1,0 +1,193 @@
+<h1 class="page-title">Checkout</h1>
+
+@if (cart && cart.items.length > 0) {
+<div class="checkout-wrapper">
+
+  <div class="checkout-left">
+  <form [formGroup]="checkoutForm" (ngSubmit)="placeOrder()">
+
+    <!-- SHIPPING ADDRESS -->
+    <section class="checkout-section">
+      <div class="section-header">
+        <h2 class="section-title">Shipping Address</h2>
+        <button type="button" class="add-address-btn" (click)="toggleNewAddress()">
+          {{ showNewAddress ? '✕ Cancel' : '+ Add New Address' }}
+        </button>
+      </div>
+
+      <!-- SAVED ADDRESSES -->
+      @if (!showNewAddress) {
+        @if (addresses.length === 0) {
+          <p class="no-address">No saved addresses. Add a new one.</p>
+        }
+        <div class="address-grid">
+          @for (addr of addresses; track addr._id) {
+          <div class="address-card" 
+               [class.selected]="selectedAddress?._id === addr._id"
+               (click)="selectAddress(addr)">
+            <div class="address-card-header">
+              <span class="address-label">{{ addr.label }}</span>
+              @if (selectedAddress?._id === addr._id) {
+                <span class="address-check">✓</span>
+              }
+            </div>
+            <p>{{ addr.street }}, {{ addr.building }}</p>
+            <p>{{ addr.city }}</p>
+          </div>
+          }
+        </div>
+        @if (!selectedAddress && checkoutForm.get('addressId')?.touched) {
+          <span class="error">Please select an address</span>
+        }
+      }
+
+      <!-- NEW ADDRESS FORM -->
+      @if (showNewAddress) {
+      <div class="address-form" formGroupName="newAddress">
+        <div class="field-row">
+          <div class="field">
+            <label>Label</label>
+            <input type="text" formControlName="label" placeholder="Home, Office">
+            <div *ngIf="checkoutForm.get('newAddress.label')?.invalid 
+            && checkoutForm.get('newAddress.label')?.touched"> 
+              <span class="error">Label is required</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>City</label>
+            <input type="text" formControlName="city" placeholder="Cairo">
+            <div *ngIf="checkoutForm.get('newAddress.city')?.invalid 
+            && checkoutForm.get('newAddress.city')?.touched">
+              <span class="error">City is required</span>
+               </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Street</label>
+            <input type="text" formControlName="street" placeholder="9 st">
+            <div *ngIf="checkoutForm.get('newAddress.street')?.invalid 
+            && checkoutForm.get('newAddress.street')?.touched"> 
+              <span class="error">Street is required</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Building</label>
+            <input type="text" formControlName="building" placeholder="31">
+            <div *ngIf="checkoutForm.get('newAddress.building')?.invalid 
+            && checkoutForm.get('newAddress.building')?.touched">
+              <span class="error">Building is required</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="save-address-btn" (click)="saveAddress()">
+          Save Address
+        </button>
+      </div>
+      }
+
+    </section>
+
+    <!-- DELIVERY METHOD -->
+    <section class="checkout-section">
+      <h2 class="section-title">Delivery Method</h2>
+      <div class="delivery-options">
+
+        <label class="delivery-option" [class.selected]="checkoutForm.get('delivery')?.value === 'standard'">
+          <input type="radio" formControlName="delivery" value="standard">
+          <div class="delivery-info">
+            <span class="delivery-name">Standard Shipping</span>
+            <span class="delivery-days">4–7 Business Days</span>
+          </div>
+          <span class="delivery-price free">Free</span>
+        </label>
+
+       
+
+      </div>
+    </section>
+
+  <!-- PAYMENT METHOD -->
+<section class="checkout-section">
+  <h2 class="section-title">Payment Method</h2>
+
+  <label class="delivery-option"
+         [class.selected]="checkoutForm.get('paymentMethod')?.value === 'cash'">
+
+    <input type="radio" formControlName="paymentMethod" value="cash">
+
+    <div class="delivery-info">
+      <span class="delivery-name">Cash on Delivery</span>
+      <span class="delivery-days">Pay when your order arrives</span>
+    </div>
+
+    <span class="payment-check">✓</span>
+
+  </label>
+
+</section>
+
+    <button type="submit" class="place-order-btn" [disabled]="isLoading" >
+      {{ isLoading ? 'Placing Order...' : 'Place Order' }}
+    </button>
+
+    @if (errorMsg) {
+      <p class="error-msg">{{ errorMsg }}</p>
+    }
+
+  </form>
+  </div>
+
+  <!-- ORDER SUMMARY -->
+  <div class="checkout-summary">
+    <h4>Order Summary</h4>
+
+    <div class="summary-items">
+      @for (item of cart.items; track item._id) {
+      <div class="summary-item">
+        <div class="summary-item-image">
+          <img [src]="staticURL + item.productId.image" [alt]="item.productId.name">
+        </div>
+        <div class="summary-item-info">
+          <p class="summary-item-name">{{ item.productId.name }}</p>
+          <p class="summary-item-qty">Qty: {{ item.quantity }}</p>
+        </div>
+        <p class="summary-item-price">{{ item.productId.price * item.quantity }} $</p>
+      </div>
+      }
+    </div>
+
+    <div class="summary-divider"></div>
+
+    <div class="summary-row">
+      <span>Subtotal</span>
+      <span>{{ totalPrice }} $</span>
+    </div>
+    <div class="summary-row">
+      <span>Shipping</span>
+      <span [class.free]="checkoutForm.get('delivery')?.value === 'standard'">
+        Free
+      </span>
+    </div>
+
+    <div class="summary-divider"></div>
+
+    <div class="summary-row total">
+      <span>Total</span>
+      <span>{{ totalPrice }} $</span>
+    </div>
+
+  </div>
+
+</div>
+}
+
+@if (!cart || cart.items.length === 0) {
+  <div class="cart-empty">
+    <p>Your cart is empty.</p>
+    <a routerLink="/productlist" class="place-order-btn" style="text-decoration:none; text-align:center;">Shop Now</a>
+ 
+</div>
+    <br>
+
+}
