@@ -79,7 +79,6 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req,res)=>{
     try {
     const id =req.params.id
-    // Prevent deletion if products exist under this category
     const hasProducts = await Product.findOne({ categoryId: id, isActive: true }); 
     if(hasProducts){
         return res.status(400).json({success:false, message: 'Cannot delete category with existing products'})
@@ -100,9 +99,6 @@ const deleteCategory = async (req,res)=>{
 } 
 
 
-// ══════════════════════════════════════════════
-// SUBCATEGORIES
-// ══════════════════════════════════════════════
 
 const getSubCategories = async (req, res) => {
   try {
