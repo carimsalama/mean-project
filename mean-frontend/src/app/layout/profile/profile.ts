@@ -57,7 +57,7 @@ onImageSelected(event: Event) {
   const input = event.target as HTMLInputElement;
   if (input.files?.length) {
     this.selectedImage = input.files[0];
-    // show preview
+    
     const reader = new FileReader();
     reader.onload = (e) => {
       this.previewImage = e.target?.result as string;
@@ -84,7 +84,7 @@ onImageSelected(event: Event) {
     return;
   }
   
-   // use FormData if image selected, else send JSON
+
   if (this.selectedImage) {
     const formData = new FormData();
     formData.append('name', name);
