@@ -9,13 +9,11 @@ const placeOrder = async (req, res)=>{
         
     const {addressId,paymentMethod='cash',newAddress}= req.body;
     
-    //Get Cart Items for make order to this user
     const cart = await Cart.findOne({userId: req.user._id}).populate('items.productId');
     if (!cart || cart.items.length === 0){
         return res.status(400).json({success:false, message:'Cart is Empty'});
     }
 
-    // check if user send new address or select one of the addresses provided
     let address;
     if (newAddress){
         address = newAddress;
@@ -34,8 +32,6 @@ const placeOrder = async (req, res)=>{
         return res.status(400).json({success: false, message: 'Address is required'})
     }
 
-    //check the stock again of the cart items !
-    //  and make order 
     const orderItems = [];
     for (const item of cart.items){
         const product = item.productId;
@@ -54,7 +50,6 @@ const placeOrder = async (req, res)=>{
         });
     }
 
-    // create the order
 
     const order = await Order.create({
         userId: req.user._id,
@@ -66,14 +61,12 @@ const placeOrder = async (req, res)=>{
 
     })
 
-    // decress the number of product stock 
     for (const item of cart.items){
         await Product.findByIdAndUpdate(item.productId._id,{
             $inc: {stock: -item.quantity}
         });
     }
 
-        // Clear cart after order
     await Cart.findOneAndUpdate({ userId: req.user._id }, { items: [], totalPrice: 0 });
 
     res.status(201).json({ success: true, message: 'Order placed successfully', data:order });
@@ -92,7 +85,6 @@ const getOrderById = async (req, res) => {
          return res.status(404).json({ success: false, message: 'Order not found' });
        }
 
-    // Only owner or admin can view
     if (order.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
@@ -135,7 +127,6 @@ const cancelOrder = async(req, res)=>{
             return res.status(404).json({success:false , message: 'Order Not Found'});
         }
 
-        //user can only cancel Pending orders
         if (order.status !=='Pending'){
             return res.status(400).json({
                 success:false,
@@ -146,7 +137,6 @@ const cancelOrder = async(req, res)=>{
         order.status = 'Cancelled';
         order.statusHistory.push({ status: 'Cancelled', changedBy: req.user._id });
 
-        //restore stock 
         for (const item of order.items){
             await Product.findByIdAndUpdate(item.productId, {$inc: {stock:item.quantity}});
         }
@@ -158,7 +148,6 @@ const cancelOrder = async(req, res)=>{
     }
 }
 
-// Get all orders (Admin)
 
 const getAllOrders = async (req, res)=>{
     try {
@@ -190,7 +179,6 @@ const getAllOrders = async (req, res)=>{
     }
 }
 
-// Update order status (Admin)
 const updateOrderStatus = async (req,res)=>{
     try {
     const {status}= req.body;
@@ -203,7 +191,6 @@ const updateOrderStatus = async (req,res)=>{
     if (!order){
     return res.status(404).json({ success: false, message: 'Order not found' });
     }
-    // If cancelling, restore stock
     if ((status === 'Cancelled' && order.status !== 'Cancelld') || (status === 'Cancelled by Admin' && order.status !== 'Cancelled by Admin') ){
         for (const item of order.items){
             await Product.findByIdAndUpdate(item.productId, { $inc:{stock: item.quantity}})
