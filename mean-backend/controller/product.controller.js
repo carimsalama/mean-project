@@ -111,7 +111,7 @@ const getProductBySlug = async (req, res) => {
       });
     }
 
-    // Get related products (same subcategory)
+    
     const related = await Product.find({
       slug: { $ne: slug },
       isActive: true
@@ -143,7 +143,6 @@ const getProductById = async(req, res)=>{
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    // Get related products (same subcategory)
     const related = await Product.find({
       subCategoryId: product.subCategoryId,
       _id: { $ne: product._id },
