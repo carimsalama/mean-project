@@ -95,13 +95,13 @@ saveAddress() {
     this.showNewAddress = !this.showNewAddress;
     const group = this.checkoutForm.get('newAddress') as FormGroup;
     if (this.showNewAddress) {
-      // add validators when shown
+     
       Object.keys(group.controls).forEach(key => {
         group.get(key)?.setValidators(Validators.required);
         group.get(key)?.updateValueAndValidity();
       });
     } else {
-      // remove validators when hidden
+      
       Object.keys(group.controls).forEach(key => {
         group.get(key)?.clearValidators();
         group.get(key)?.updateValueAndValidity();
@@ -110,10 +110,6 @@ saveAddress() {
     }
   }
 
-  // isInvalidNested(field: string): boolean {
-  //   const c = this.checkoutForm.get('newAddress')?.get(field);
-  //   return !!(c?.invalid && c?.touched);
-  // }
 
   get totalPrice(): number {
     if (!this.cart) return 0;
