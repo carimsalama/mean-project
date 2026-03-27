@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-notfound',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './notfound.html',
   styleUrl: './notfound.css',
 })
