@@ -11,12 +11,10 @@ const getReports = async (req, res) => {
 
     const orderFilter = Object.keys(dateFilter).length ? { createdAt: dateFilter } : {};
 
-    // Total orders count by status
     const ordersByStatus = await Order.aggregate([
       { $match: orderFilter },
       { $group: { _id: '$status', count: { $sum: 1 } } }
     ]);
-    // Total revenue (from Delivered orders only)
     const revenueResult = await Order.aggregate([
       { $match: { ...orderFilter, status: 'Delivered' } },
       { $group: { _id: null, totalRevenue: { $sum: '$totalPrice' } } }
@@ -24,7 +22,6 @@ const getReports = async (req, res) => {
     
     const totalRevenue = revenueResult[0]?.totalRevenue || 0;
 
-    // Orders per day (last 30 days)
     const ordersPerDay = await Order.aggregate([
       {
         $match: {
@@ -41,7 +38,6 @@ const getReports = async (req, res) => {
       { $sort: { _id: 1 } }
     ]);
 
-    // Best selling products
     const bestSellers = await Order.aggregate([
       { $match: { status: { $ne: 'Cancelled' } } },
       { $unwind: '$items' },
@@ -58,13 +54,10 @@ const getReports = async (req, res) => {
       { $limit: 5 }
     ]);
 
-    // Total users
     const totalUsers = await User.countDocuments({ role: 'user' });
 
-    // Total products
     const totalProducts = await Product.countDocuments({ isActive: true });
 
-    // Total orders
     const totalOrders = await Order.countDocuments(orderFilter);
 
    
