@@ -70,8 +70,8 @@ this._cartService.addToCart(this.myProduct._id, this.quantity)
 
     this._activatedRoute.paramMap.subscribe(paramMap=>{
       this.slug = paramMap.get('slug')!
-      this.quantity = 1; // reset quantity on every new product
-      this.isAddedToCart = false; // reset on product change
+      this.quantity = 1; 
+      this.isAddedToCart = false;
 
       this.productService.getProductDetails(this.slug).subscribe(prodres=> {
         console.log(prodres);
