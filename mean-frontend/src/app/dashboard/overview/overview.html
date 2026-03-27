@@ -1,0 +1,222 @@
+<div class="topbar">
+  <h1 class="topbar-title">Overview</h1>
+  <div class="date-filter">
+    <div class="date-field">
+      <label>From</label>
+      <input type="date" [formControl]="startDate">
+    </div>
+    <div class="date-field">
+      <label>To</label>
+      <input type="date" [formControl]="endDate">
+    </div>
+    <button class="dash-btn primary" (click)="applyFilter()">Apply</button>
+    <button class="dash-btn ghost" (click)="clearFilter()">Clear</button>
+  </div>
+</div>
+
+<!-- STATS CARDS -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <p class="stat-label">Total Products</p>
+    <h2 class="stat-value">{{ summary?.totalProducts }}</h2>
+    <div class="stat-bar"></div>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Total Orders</p>
+    <h2 class="stat-value">{{ summary?.totalOrders }}</h2>
+    <div class="stat-bar"></div>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Total Users</p>
+    <h2 class="stat-value">{{ summary?.totalUsers }}</h2>
+    <div class="stat-bar"></div>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Total Revenue</p>
+    <h2 class="stat-value">{{ summary?.totalRevenue }} $</h2>
+    <div class="stat-bar accent"></div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="overview-grid">
+
+  <!-- LEFT SIDE -->
+  <div class="overview-left">
+
+  
+   <!-- ORDERS BY STATUS -->
+  <div class="overview-card">
+    <div class="overview-card-header">
+      <h3 class="overview-card-title">Orders by Status</h3>
+      <a class="overview-card-link" routerLink="/dashboard/orders">
+        View All Orders
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+    </div>
+    <div class="status-list">
+      @for (status of ordersByStatus; track status._id) {
+      <div class="status-row">
+        <div class="status-row-left">
+          <span class="status-dot" [ngClass]="getStatusClass(status._id)"></span>
+          <span class="status-name">{{ status._id }}</span>
+        </div>
+        <div class="status-row-right">
+          <div class="status-bar-track">
+            <div class="status-bar-fill"
+              [ngClass]="getStatusClass(status._id)"
+              [style.width]="getStatusPercent(status.count) + '%'">
+            </div>
+          </div>
+          <span class="status-count">{{ status.count }}</span>
+        </div>
+      </div>
+      }
+    </div>
+    
+  </div>
+
+  <!-- RECENT ORDERS -->
+<div class="overview-card">
+  <div class="overview-card-header">
+    <h3 class="overview-card-title">Recent Orders</h3>
+    <a class="overview-card-link" routerLink="/dashboard/orders">
+      View All
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>
+  </div>
+
+  <table class="recent-table">
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Customer</th>
+        <th>Total</th>
+        <th>Quantity</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (recentOrders.length === 0) {
+        <tr>
+          <td colspan="5" class="recent-empty">No recent orders.</td>
+        </tr>
+      }
+      @for (order of recentOrders; track order) {
+      <tr>
+        <td class="recent-order-number">{{ order.orderNumber }}</td>
+        <td class="recent-customer">{{ order.userId.name }}</td>
+        <td class="recent-total">{{ order.totalPrice }} $</td>
+        <td class="total-quantity">{{ order.items[0].quantity }} </td>
+        
+        <td>
+          <span class="order-status-badge" [ngClass]="getStatusClass(order.status)">
+            {{ order.status }}
+          </span>
+        </td>
+        <td class="recent-date">{{ order.createdAt | date:'MMM d' }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+   <!-- ORDERS PER DAY -->
+<div class="overview-card">
+  <div class="overview-card-header">
+    <h3 class="overview-card-title">Orders Per Day</h3>
+  </div>
+  <div class="chart-wrapper">
+    @for (day of ordersPerDay; track day._id) {
+    <div class="chart-col">
+      <span class="chart-count">{{ day.count }}</span>
+      <div class="chart-bar-track">
+        <div class="chart-bar-fill" [style.height]="getDayPercent(day.count) + '%'"></div>
+      </div>
+      <span class="chart-label">{{ day._id | date:'d MMM' }}</span>
+    </div>
+    }
+  </div>
+  
+</div>
+
+<!-- LOW STOCK WARNING -->
+@if (lowStock.length > 0) {
+<div class="overview-card">
+  <div class="overview-card-header">
+    <h3 class="overview-card-title">
+      <span class="warning-icon">⚠</span>
+      Low Stock Alert
+    </h3>
+    <a class="overview-card-link" routerLink="/dashboard/products">
+      Manage Products
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="lowstock-list">
+    @for (product of lowStock; track product._id) {
+    <div class="lowstock-item">
+      <div class="lowstock-image">
+        <img [src]="staticURL + product.image" [alt]="product.name">
+      </div>
+      <div class="lowstock-info">
+        <p class="lowstock-name">{{ product.name }}</p>
+        <p class="lowstock-cat">{{ product.categoryId.name }}</p>
+      </div>
+      <div class="lowstock-right">
+        <span class="lowstock-badge" [class.critical]="product.stock === 0" [class.low]="product.stock > 0">
+          @if (product.stock === 0) { Out of Stock }
+          @else { {{ product.stock }} left }
+        </span>
+        <span class="lowstock-price">{{ product.price }} $</span>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+}
+  </div>
+
+  <!-- RIGHT SIDE — BEST SELLERS -->
+  <div class="overview-card">
+  <div class="overview-card-header">
+    <h3 class="overview-card-title">Best Sellers</h3>
+    <a class="overview-card-link" routerLink="/dashboard/products">
+      View All Products
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>
+  </div>
+  <div class="bestsellers-list">
+    @for (product of bestSellers; track product._id; let i = $index) {
+    <div class="bestseller-item">
+      <span class="bestseller-rank">{{ i + 1 }}</span>
+      <div class="bestseller-image">
+        <img [src]="staticURL + product.image" [alt]="product.name">
+      </div>
+      <div class="bestseller-info">
+        <p class="bestseller-name">{{ product.name }}</p>
+        <p class="bestseller-price">{{ product.totalRevenue }} $</p>
+      </div>
+      <div class="bestseller-right">
+        <p class="bestseller-sold">{{ product.totalSold }} sold</p>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+
+</div>

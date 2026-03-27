@@ -1,0 +1,97 @@
+<div class="topbar">
+  <h1 class="topbar-title">Testimonials</h1>
+</div>
+
+<!-- EDIT STATUS FORM -->
+@if (showForm) {
+<div class="dash-form-card">
+  <h3 class="form-title">Update Testimonial Status</h3>
+
+  <form [formGroup]="statusForm" (ngSubmit)="save()" class="dash-form">
+
+    <!-- PREVIEW -->
+    @if (selectedItem) {
+    <div class="testimonial-preview">
+      <div class="preview-header">
+        <p class="preview-name">{{ selectedItem.userId.name }}</p>
+        <div class="preview-stars">
+          @for (star of getStars(selectedItem.rating); track star) {
+            <span class="star" [class.filled]="star <= selectedItem.rating">★</span>
+          }
+        </div>
+      </div>
+      <p class="preview-message">"{{ selectedItem.message }}"</p>
+    </div>
+    }
+
+    <div class="field-row">
+      <div class="field">
+        <label>Status</label>
+        <select formControlName="isApproved">
+          <option value="true">Accept</option>
+          <option value="false">Reject</option>
+        </select>
+        @if (statusForm.get('isApproved')?.invalid && statusForm.get('isApproved')?.touched) {
+          <span class="field-error">Status is required</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="dash-btn primary">Save</button>
+      <button type="button" class="dash-btn ghost" (click)="closeForm()">Cancel</button>
+    </div>
+
+  </form>
+</div>
+}
+
+<!-- TABLE -->
+<div class="dash-table-wrapper">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Message</th>
+        <th>Rating</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (testimonials.length === 0) {
+        <tr>
+          <td colspan="7" class="td-empty">No testimonials found.</td>
+        </tr>
+      }
+      @for (item of testimonials; track item._id) {
+      <tr>
+        <td class="td-name">{{ item.userId.name }}</td>
+        <td>{{ item.userId.email }}</td>
+        <td class="td-message">{{ item.message }}</td>
+        <td>
+          <div class="table-stars">
+            @for (star of getStars(item.rating); track star) {
+              <span class="star" [class.filled]="star <= item.rating">★</span>
+            }
+          </div>
+        </td>
+        <td>
+          <span class="order-status-badge" [ngClass]="getStatusClass(item.isApproved)">
+            {{ item.isApproved ? 'Approved' : 'Pending' }}
+          </span>
+        </td>
+        <td class="td-date">{{ item.createdAt | date:'MMM d, yyyy' }}</td>
+        <td>
+          <div class="table-actions">
+            <button class="action-btn edit" (click)="openEdit(item)">Review</button>
+            <button class="action-btn delete" (click)="delete(item._id)">Delete</button>
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,115 @@
+<div class="topbar">
+  <h1 class="topbar-title">Orders</h1>
+  <div class="topbar-right">
+    <select class="status-filter-select" [formControl]="statusFilter">
+      <option value="">All Statuses</option>
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ s }}</option>
+      }
+    </select>
+  </div>
+</div>
+
+@if (showForm) {
+<div class="dash-form-card">
+  <h3 class="form-title">Update Order Status — {{ selectedOrder?.orderNumber }}</h3>
+
+  <form [formGroup]="statusForm" (ngSubmit)="save()" class="dash-form">
+    <div class="field-row">
+      <div class="field">
+        <label>Status</label>
+        <select formControlName="status">
+          @for (s of statuses; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+        @if (statusForm.get('status')?.invalid && statusForm.get('status')?.touched) {
+          <span class="field-error">Status is required</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="dash-btn primary">Update Status</button>
+      <button type="button" class="dash-btn ghost" (click)="closeForm()">Cancel</button>
+    </div>
+
+  </form>
+</div>
+}
+
+<div class="dash-table-wrapper">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Customer</th>
+        <th>Date</th>
+        <th>Items</th>
+        <th>Total</th>
+        <th>Payment</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (orders.length === 0) {
+        <tr>
+          <td colspan="7" class="td-empty">No orders found.</td>
+        </tr>
+      }
+
+      @for (order of orders; track order._id) {
+      <tr>
+        <td class="td-name">{{ order.orderNumber }}</td>
+        <td>
+          <p class="td-customer-name">Name: {{ order.userId.name }}</p>
+            
+          <p class="td-customer-email">Email: {{ order.userId.email }}</p>
+          <div>
+        <p class="td-customer-name">Label: {{ order.address.label }}</p>
+        <p class="td-customer-name">City: {{ order.address.city }}</p>
+        <p class="td-customer-name">Street: {{ order.address.street }}</p>
+        <p class="td-customer-name">Building: {{ order.address.building }}</p>
+      </div>
+        </td>
+        <td class="td-date">{{ order.createdAt | date:'MMM d, yyyy' }}</td>
+        
+        <td>
+          @for (item of order.items; track item) {
+          <div  class="td-name" >
+            {{ item.name }} × <span class="quantity"> {{ item.quantity }}</span>
+          </div>
+        }
+        </td>
+        <td>{{ order.totalPrice }} $</td>
+        <td class="td-payment">{{ order.paymentMethod }}</td>
+        <td>
+          <span class="order-status-badge" [ngClass]="getStatusClass(order.status)">
+            {{ order.status }}
+          </span>
+          
+        </td>
+        <td>
+          <div class="table-actions">
+            <button class="action-btn edit" (click)="openEdit(order)">Edit Status</button>
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (pagination && pagination.pages > 1) {
+  <div class="dash-pagination">
+    <button class="page-btn" (click)="changePage(pagination.page - 1)" [disabled]="pagination.page === 1">←</button>
+    @for (page of getPages(); track page) {
+      <button class="page-btn" [class.active]="page === pagination.page" (click)="changePage(page)">{{ page }}</button>
+    }
+    <button class="page-btn" (click)="changePage(pagination.page + 1)" [disabled]="pagination.page === pagination.pages">→</button>
+    <span class="pagination-info">{{ pagination.page }} of {{ pagination.pages }} pages ({{ pagination.total }} orders)</span>
+  </div>
+  }
+
+</div>
+
