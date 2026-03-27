@@ -25,7 +25,6 @@ const register = async (req, res)=>{
             success:true,
             message:'Registration successful',
             token
-            //if i need to send the user data i'll add it here
         })
 
     }
