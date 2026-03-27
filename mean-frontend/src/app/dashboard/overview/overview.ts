@@ -61,7 +61,7 @@ constructor(
 
     if (!start || !end) return;
 
-    // format to match your API: MM-DD-YYYY
+    
     const formatted = (date: string) => {
       const [year, month, day] = date.split('-');
       return `${month}-${day}-${year}`;
