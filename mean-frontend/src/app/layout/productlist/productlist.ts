@@ -53,7 +53,7 @@ export class Productlist implements OnInit{
       
     });
 
-     // load all subcategories
+  
     this._subCategoryService.getSubCategories().subscribe({
       next: (res) => {
         this.allSubCategories = res.data;
@@ -71,27 +71,17 @@ export class Productlist implements OnInit{
       this.currentPage = 1;
       this.filterSubsByCategory(categoryId);
       this.loadProducts();
-      // if (categoryId ===null) {
-      //   categoryId ='';
-      // }
+    
       });
- // search debounce
+
     this.searchControl.valueChanges.pipe(
     ).subscribe(() => { this.currentPage = 1; this.loadProducts(); });
 
-    // price debounce
     this.minPriceControl.valueChanges.subscribe(() => { this.currentPage = 1; this.loadProducts(); });
 
     this.maxPriceControl.valueChanges.subscribe(() => { this.currentPage = 1; this.loadProducts(); });
      
-    //   this._productService.getProducts(categoryId).subscribe({
-    //   next: (res) => {
-    //     this.products   = res.products || [];
-    //     this.pagination = res.pagination;
-    //     this.cdr.detectChanges();
-    //   },
-    //   error: (err) => console.error(err)
-    // });
+   
     
   }
   loadProducts() {
@@ -167,26 +157,3 @@ export class Productlist implements OnInit{
 }
 
 
-
-
-// ngOnInit(): void {
-    
-//  this._activatedRoute.paramMap.subscribe(params => {
-//       let categoryId = params.get('id'); 
-//       if (categoryId ===null) {
-//         categoryId ='';
-//       }
-      
-//       this._productService.getProducts(categoryId).subscribe({
-//       next: (res) => {
-//         this.products   = res.products || [];
-//         this.pagination = res.pagination;
-//         this.cdr.detectChanges();
-//       },
-//       error: (err) => console.error(err)
-//     });
-//     });
- 
-   
-
-//   }
