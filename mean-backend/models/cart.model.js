@@ -12,7 +12,7 @@ const cartItemSchema = new mongoose.Schema({
         min: [1, 'Quantity must be at least 1'],
         default:1
     },
-    price:Number // snapshot of price at time of adding
+    price:Number
 });
 
 const cartSchema = new mongoose.Schema({
