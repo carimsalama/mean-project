@@ -3,7 +3,7 @@ const {addAddress,deleteAddress,getAddresses,updateAddress}= require('../control
 
 const {protect} = require('../middleware/auth.middleware');
 
-router.use(protect); // All address routes require login
+router.use(protect);
 router.get('/', getAddresses);
 router.post('/', addAddress);
 router.put('/:id', updateAddress);
