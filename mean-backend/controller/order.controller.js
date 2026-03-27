@@ -191,7 +191,7 @@ const updateOrderStatus = async (req,res)=>{
     if (!order){
     return res.status(404).json({ success: false, message: 'Order not found' });
     }
-    if ((status === 'Cancelled' && order.status !== 'Cancelld') || (status === 'Cancelled by Admin' && order.status !== 'Cancelled by Admin') ){
+    if ((status === 'Cancelled' && order.status !== 'Cancelled') || (status === 'Cancelled by Admin' && order.status !== 'Cancelled by Admin') ){
         for (const item of order.items){
             await Product.findByIdAndUpdate(item.productId, { $inc:{stock: item.quantity}})
         }
